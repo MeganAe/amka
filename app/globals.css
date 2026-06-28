@@ -1,0 +1,133 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --background: #fcf8ff;
+  --surface: #ffffff;
+  --surface-soft: #f5f2fe;
+  --surface-mid: #efecf8;
+  --surface-high: #e9e6f3;
+  --border: #c7c4d7;
+  --text: #1b1b23;
+  --muted: #767586;
+  --primary: #4648d4;
+  --secondary: #00687a;
+  --error: #ba1a1a;
+  --success: #10b981;
+  --warning: #f59e0b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  background: var(--background);
+  color: var(--text);
+  font-family: Inter, sans-serif;
+}
+
+body {
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+@layer components {
+  .medical-card {
+    @apply rounded-xl border border-border bg-surface shadow-card;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#3839aa] disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-semibold text-text transition hover:bg-surface-soft disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .input-field {
+    @apply w-full rounded-lg border border-border bg-white px-3 py-2.5 text-sm text-text outline-none transition placeholder:text-muted focus:border-primary focus:ring-4 focus:ring-primary/10;
+  }
+
+  .label {
+    @apply mb-2 block text-sm font-semibold text-text;
+  }
+
+  .table-head {
+    @apply bg-surface-soft text-left text-xs font-bold uppercase tracking-wide text-muted;
+  }
+
+  .skeleton {
+    @apply animate-pulse rounded-lg bg-surface-high;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #c7c4d7;
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9d97c5;
+}
+
+/* Selection */
+::selection {
+  background: #4648d433;
+  color: #1b1b23;
+}
+
+/* Focus ring for keyboard nav */
+:focus-visible {
+  outline: 2px solid #4648d4;
+  outline-offset: 2px;
+}
+
+/* Mobile Responsive Compact Optimizations */
+@media (max-width: 640px) {
+  .medical-card {
+    padding: 1rem !important; /* Shrunk padding from 24px to 16px */
+  }
+  .input-field {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    font-size: 0.8125rem !important; /* More compact inputs */
+  }
+  h2 {
+    font-size: 1.5rem !important; /* Smaller page titles */
+  }
+  .btn-primary, .btn-secondary {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.8125rem !important; /* Shrunk buttons */
+  }
+  .px-6 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  .py-3.5, .py-4 {
+    padding-top: 0.625rem !important;
+    padding-bottom: 0.625rem !important;
+  }
+  .gap-6 {
+    gap: 1rem !important;
+  }
+}
