@@ -1,5 +1,5 @@
 -- 1. Synchronisation des profils pour tous les utilisateurs auth existants
--- Cette requête crée une ligne dans 'public.profiles' pour chaque compte dans 'auth.users' s'il n'en a pas déjà une.
+-- Cette requête crée une ligne dans 'public.profiles' et 'public.users' pour chaque compte dans 'auth.users' s'il n'en a pas déjà une.
 INSERT INTO public.profiles (id, email, first_name, last_name, role, is_active)
 SELECT 
   id, 
@@ -14,6 +14,21 @@ SET
   email = EXCLUDED.email,
   first_name = COALESCE(profiles.first_name, EXCLUDED.first_name),
   last_name = COALESCE(profiles.last_name, EXCLUDED.last_name);
+
+INSERT INTO public.users (id, email, first_name, last_name, role, is_active)
+SELECT 
+  id, 
+  email, 
+  COALESCE(raw_user_meta_data->>'first_name', split_part(email, '@', 1)), 
+  COALESCE(raw_user_meta_data->>'last_name', 'AMKA'), 
+  COALESCE((raw_user_meta_data->>'role')::user_role, 'RECEPTIONIST'::user_role), 
+  true
+FROM auth.users
+ON CONFLICT (id) DO UPDATE 
+SET 
+  email = EXCLUDED.email,
+  first_name = COALESCE(users.first_name, EXCLUDED.first_name),
+  last_name = COALESCE(users.last_name, EXCLUDED.last_name);
 
 -- 2. Insertion de données de test enrichies (Patients, Consultations, Pharmacie, Comptabilité)
 -- Note : Ces données ne sont insérées que si elles n'existent pas déjà.

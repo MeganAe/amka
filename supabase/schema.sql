@@ -16,6 +16,16 @@ create table profiles (
   created_at timestamptz default now()
 );
 
+create table users (
+  id uuid references auth.users primary key,
+  email text unique not null,
+  first_name text not null,
+  last_name text not null,
+  role user_role not null default 'RECEPTIONIST',
+  is_active boolean default true,
+  created_at timestamptz default now()
+);
+
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
@@ -32,6 +42,18 @@ begin
     true
   )
   on conflict (id) do nothing;
+
+  insert into public.users (id, email, first_name, last_name, role, is_active)
+  values (
+    new.id,
+    new.email,
+    coalesce(new.raw_user_meta_data->>'first_name', 'Utilisateur'),
+    coalesce(new.raw_user_meta_data->>'last_name', 'AMKA'),
+    coalesce((new.raw_user_meta_data->>'role')::user_role, 'RECEPTIONIST'::user_role),
+    true
+  )
+  on conflict (id) do nothing;
+
   return new;
 end;
 $$;
@@ -118,6 +140,7 @@ create table expenses (
 );
 
 alter table profiles enable row level security;
+alter table users enable row level security;
 alter table patients enable row level security;
 alter table consultations enable row level security;
 alter table payments enable row level security;
@@ -126,6 +149,7 @@ alter table sales enable row level security;
 alter table expenses enable row level security;
 
 create policy "auth_profiles" on profiles for all using (auth.role()='authenticated');
+create policy "auth_users" on users for all using (auth.role()='authenticated');
 create policy "auth_patients" on patients for all using (auth.role()='authenticated');
 create policy "auth_consultations" on consultations for all using (auth.role()='authenticated');
 create policy "auth_payments" on payments for all using (auth.role()='authenticated');

@@ -169,7 +169,7 @@ export default function DashboardPage() {
 
     const revenueTodayValue =
       paymentsToday.data?.reduce(
-        (sum, payment) => sum + Number(payment.montant),
+        (sum: number, payment: any) => sum + Number(payment.montant),
         0,
       ) ?? 0;
 
@@ -185,7 +185,7 @@ export default function DashboardPage() {
       };
     });
 
-    paymentsWeek.data?.forEach((payment) => {
+    paymentsWeek.data?.forEach((payment: any) => {
       const key = String(payment.created_at).slice(0, 10);
       const day = days.find((item) => item.key === key);
       if (day) day.value += Number(payment.montant);

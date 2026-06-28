@@ -165,9 +165,9 @@ export default function AdminPage() {
     ]);
 
     const totalRevenue =
-      revenueRes.data?.reduce((s, p) => s + Number(p.montant), 0) ?? 0;
+      revenueRes.data?.reduce((s: number, p: any) => s + Number(p.montant), 0) ?? 0;
     const totalExpenses =
-      expensesRes.data?.reduce((s, e) => s + Number(e.amount), 0) ?? 0;
+      expensesRes.data?.reduce((s: number, e: any) => s + Number(e.amount), 0) ?? 0;
 
     setStats({
       totalUsers: allUsersRes.count ?? 0,
@@ -223,12 +223,12 @@ export default function AdminPage() {
         .gte("created_at", sevenDaysAgo.toISOString()),
     ]);
 
-    consultsWeek.data?.forEach((c) => {
+    consultsWeek.data?.forEach((c: any) => {
       const key = String(c.date_consultation).slice(0, 10);
       const d = days.find((x) => x.key === key);
       if (d) d.consultations++;
     });
-    paymentsWeek.data?.forEach((p) => {
+    paymentsWeek.data?.forEach((p: any) => {
       const key = String(p.created_at).slice(0, 10);
       const d = days.find((x) => x.key === key);
       if (d) d.payments++;

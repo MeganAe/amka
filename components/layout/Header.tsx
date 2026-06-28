@@ -33,8 +33,8 @@ export function Header({ profile, onMenuClick }: HeaderProps) {
       // 1. Low stock meds
       const { data: meds } = await supabase.from("medications").select("name, stock, threshold").eq("is_active", true);
       const lowStock = (meds ?? [])
-        .filter((m) => m.stock <= m.threshold)
-        .map((m, idx) => ({
+        .filter((m: any) => m.stock <= m.threshold)
+        .map((m: any, idx: number) => ({
           id: `stock-${m.name}-${idx}`,
           type: "stock" as const,
           text: `Alerte stock : Le stock de ${m.name} est faible (${m.stock} restants).`,
@@ -77,7 +77,7 @@ export function Header({ profile, onMenuClick }: HeaderProps) {
     // Subscribe to realtime changes
     const channel = supabase
       .channel("header-notifications")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "consultations" }, async (payload) => {
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "consultations" }, async (payload: any) => {
         const { data: p } = await supabase.from("patients").select("nom, prenom").eq("id", payload.new.patient_id).maybeSingle();
         const pName = p ? `${p.prenom} ${p.nom}` : "nouveau patient";
         setNotifications((prev) => [
@@ -91,7 +91,7 @@ export function Header({ profile, onMenuClick }: HeaderProps) {
           ...prev,
         ]);
       })
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "payments" }, async (payload) => {
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "payments" }, async (payload: any) => {
         const { data: p } = await supabase.from("patients").select("nom, prenom").eq("id", payload.new.patient_id).maybeSingle();
         const pName = p ? `${p.prenom} ${p.nom}` : "patient";
         setNotifications((prev) => [
@@ -105,7 +105,7 @@ export function Header({ profile, onMenuClick }: HeaderProps) {
           ...prev,
         ]);
       })
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "medications" }, (payload) => {
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "medications" }, (payload: any) => {
         if (payload.new.stock <= payload.new.threshold && payload.new.is_active) {
           setNotifications((prev) => [
             {
