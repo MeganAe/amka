@@ -18,13 +18,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         data: { user },
       } = await supabase.auth.getUser();
 
-      // Pas connecté → rediriger vers /login (remplace le middleware)
       if (!user) {
         router.push("/login");
         return;
       }
 
-      // 1. Essayer de charger le profil depuis la table profiles
+      // Toujours charger depuis la table profiles (source de vérité pour le rôle)
       const { data } = await supabase
         .from("profiles")
         .select("*")
@@ -36,13 +35,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // 2. Fallback : profil non trouvé → on le crée automatiquement
+      // Fallback: créer le profil s'il n'existe pas encore
       const meta = user.user_metadata ?? {};
       const firstName: string =
         meta.first_name ?? meta.full_name?.split(" ")[0] ?? user.email?.split("@")[0] ?? "Utilisateur";
       const lastName: string =
         meta.last_name ?? meta.full_name?.split(" ").slice(1).join(" ") ?? "";
-      const role: UserRole = (meta.role as UserRole) ?? "RECEPTIONIST";
+      // Ne PAS utiliser meta.role ici — toujours RECEPTIONIST par défaut pour les nouveaux
+      const role: UserRole = "RECEPTIONIST";
 
       const { data: created } = await supabase
         .from("profiles")
@@ -63,7 +63,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       if (created) {
         setProfile(created as Profile);
       } else {
-        // 3. Dernier recours : profil synthétique en mémoire uniquement
+        // Dernier recours: profil synthétique
         setProfile({
           id: user.id,
           email: user.email ?? "",
@@ -77,6 +77,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     }
 
     void loadProfile();
+
+    // Écouter les changements de session (reconnexion = rechargement du profil)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      void loadProfile();
+    });
+
+    return () => subscription.unsubscribe();
   }, [router]);
 
   return (
